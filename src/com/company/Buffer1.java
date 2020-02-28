@@ -1,22 +1,29 @@
 package com.company;
 import java.util.Arrays;
-import java.util.Objects;
-
 public class Buffer1<T>{
     int start;
     int end;
     T[] array;
+    int[] newArray;
     int arrayAvailableSpace;
 
     Buffer1(int arraySize){
         this.start= 0;
         this.end = 0;
         this.array =  (T[]) new Object[arraySize];
+        this.newArray = new int[arraySize];
         this.arrayAvailableSpace = arraySize;
     }
 
+    public synchronized boolean isEmpty(){
+        if (arrayAvailableSpace==array.length){
+            return true;
+        }
+        else return false;
+    }
+
     public synchronized T take() throws InterruptedException{
-        if (isEmpty()){
+        while (isEmpty()){
             wait();
         }
         T removedValue = array[start];
@@ -37,7 +44,7 @@ public class Buffer1<T>{
     }
 
     public synchronized void put(T elem) throws InterruptedException{
-        if (arrayAvailableSpace==0){
+        while (arrayAvailableSpace==0){
             wait();
         }
         array[end]=elem;
@@ -55,11 +62,5 @@ public class Buffer1<T>{
 
     }
 
-    public synchronized boolean isEmpty(){
-        if (arrayAvailableSpace==array.length){
-            return true;
-        }
-        else return false;
-    }
 }
 
